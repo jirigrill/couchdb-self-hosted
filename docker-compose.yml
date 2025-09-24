@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # CouchDB for Obsidian LiveSync
+  couchdb:
+    image: couchdb:3.3
+    container_name: obsidian-couchdb
+    restart: unless-stopped
+    ports:
+      - "${COUCHDB_PORT:-5984}:5984"
+    environment:
+      - COUCHDB_USER=${COUCHDB_USER}
+      - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}
+    volumes:
+      - couchdb_data:/opt/couchdb/data
+      - couchdb_config:/opt/couchdb/etc/local.d
+    networks:
+      - obsidian-network
+
+  # Obsidian web interface (optional - you can also use desktop app)
+  obsidian-web:
+    image: ghcr.io/sytone/obsidian-remote:latest
+    container_name: obsidian-web
+    restart: unless-stopped
+    ports:
+      - "${OBSIDIAN_PORT:-8080}:8080"
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-UTC}
+      - DOCKER_MODS=linuxserver/mods:universal-git
+    volumes:
+      - obsidian_vaults:/vaults
+      - obsidian_config:/config
+    networks:
+      - obsidian-network
+    depends_on:
+      - couchdb
+
+volumes:
+  couchdb_data:
+  couchdb_config:
+  obsidian_vaults:
+  obsidian_config:
+
+networks:
+  obsidian-network:
+    driver: bridge
