@@ -15,34 +15,12 @@ services:
       - couchdb_data:/opt/couchdb/data
       - couchdb_config:/opt/couchdb/etc/local.d
     networks:
-      - obsidian-network
-
-  # Obsidian web interface (optional - you can also use desktop app)
-  obsidian-web:
-    image: ghcr.io/sytone/obsidian-remote:latest
-    container_name: obsidian-web
-    restart: unless-stopped
-    ports:
-      - "${OBSIDIAN_PORT:-8080}:8080"
-    environment:
-      - PUID=${PUID:-1000}
-      - PGID=${PGID:-1000}
-      - TZ=${TZ:-UTC}
-      - DOCKER_MODS=linuxserver/mods:universal-git
-    volumes:
-      - obsidian_vaults:/vaults
-      - obsidian_config:/config
-    networks:
-      - obsidian-network
-    depends_on:
-      - couchdb
+      - couchdb-network
 
 volumes:
   couchdb_data:
   couchdb_config:
-  obsidian_vaults:
-  obsidian_config:
 
 networks:
-  obsidian-network:
+  couchdb-network:
     driver: bridge

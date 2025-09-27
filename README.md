@@ -1,4 +1,4 @@
-# Obsidian Self-Hosted
+# Couchdb Self-Hosted
 
 Self-hosted Obsidian setup with live-sync functionality using Docker. This setup provides a complete solution for running Obsidian with synchronization capabilities across multiple devices.
 
@@ -19,17 +19,13 @@ Self-hosted Obsidian setup with live-sync functionality using Docker. This setup
 
 ### Services
 - **CouchDB**: Database backend for Obsidian LiveSync plugin
-- **Obsidian Web**: Web-based Obsidian interface (optional)
 
 ### Volumes
 - `couchdb_data`: CouchDB database files
 - `couchdb_config`: CouchDB configuration
-- `obsidian_vaults`: Obsidian vault files
-- `obsidian_config`: Obsidian configuration
 
 ### Default Ports
 - CouchDB: `5984`
-- Obsidian Web Interface: `8080`
 
 ## Configuration
 
@@ -40,9 +36,10 @@ cp .env.example .env
 ```
 
 Key configuration options:
-- Database credentials
-- Port mappings
-- Volume paths
+- `COUCHDB_USER`: Admin username for CouchDB
+- `COUCHDB_PASSWORD`: Admin password for CouchDB
+- `COUCHDB_PORT`: Port for CouchDB (default: 5984)
+- `DATABASE_NAME`: Name for Obsidian database (default: obsidiandb)
 
 ## Development Setup
 
@@ -56,7 +53,7 @@ Key configuration options:
 1. **Clone and setup:**
    ```bash
    git clone <repository-url>
-   cd obsidian-self-hosted
+   cd couchdb-self-hosted
    make setup
    ```
 
@@ -77,15 +74,21 @@ Run `make help` to see all available commands for managing the Docker services.
 ### First Time Setup
 
 1. Start services: `make up`
-2. Access CouchDB admin interface: http://localhost:5984/_utils
-3. Configure Obsidian LiveSync plugin to connect to your CouchDB instance
-4. (Optional) Access web Obsidian interface: http://localhost:8080
+2. Configure CouchDB: `make setup-couchdb`
+3. Configure Obsidian LiveSync plugin in your Obsidian desktop/mobile app
+
+The `make setup-couchdb` command will:
+- Wait for CouchDB to be ready
+- Setup CouchDB as single node
+- Create the database (default: `obsidiandb`)
+- Apply all required configuration for Obsidian LiveSync
+- Verify the installation
 
 ### Obsidian LiveSync Configuration
 
 Configure the LiveSync plugin with:
 - **Database URL**: `http://localhost:5984`
-- **Database name**: Your chosen database name
+- **Database name**: `obsidiandb` (or as configured in `.env`)
 - **Username/Password**: As configured in `.env`
 
 ## Backup and Recovery
@@ -108,7 +111,7 @@ make up
 
 ### Common Issues
 
-1. **Port conflicts**: Check if ports 5984 or 8080 are already in use
+1. **Port conflicts**: Check if port 5984 is already in use
 2. **Permission issues**: Ensure Docker has proper permissions
 3. **Volume mounting**: Check that volume paths exist and are accessible
 
@@ -119,7 +122,6 @@ make logs
 
 # Specific service
 make logs-couchdb
-make logs-obsidian
 ```
 
 ### Resetting Everything

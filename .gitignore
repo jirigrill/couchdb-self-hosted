@@ -10,3 +10,6 @@ volumes/
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Claude
+CLAUDE.md

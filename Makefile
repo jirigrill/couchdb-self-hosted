@@ -16,8 +16,6 @@ restart: ## Restart all services
 logs: ## View logs from all services (follow mode)
 	docker-compose logs -f
 
-logs-obsidian: ## View logs from obsidian service only
-	docker-compose logs -f obsidian-web
 
 logs-couchdb: ## View logs from couchdb service only
 	docker-compose logs -f couchdb
@@ -34,8 +32,6 @@ update: ## Pull latest images and restart services
 build: ## Build services (if using custom Dockerfile)
 	docker-compose build
 
-shell-obsidian: ## Open shell in obsidian container
-	docker-compose exec obsidian-web /bin/bash
 
 shell-couchdb: ## Open shell in couchdb container
 	docker-compose exec couchdb /bin/bash
@@ -45,8 +41,6 @@ backup: ## Create backup of volumes
 	@mkdir -p backups
 	@echo "Backing up CouchDB data..."
 	@docker run --rm -v obsidian-self-hosted_couchdb_data:/data -v $(PWD)/backups:/backup alpine tar czf /backup/couchdb_data_$(shell date +%Y%m%d_%H%M%S).tar.gz -C /data .
-	@echo "Backing up Obsidian vaults..."
-	@docker run --rm -v obsidian-self-hosted_obsidian_vaults:/data -v $(PWD)/backups:/backup alpine tar czf /backup/obsidian_vaults_$(shell date +%Y%m%d_%H%M%S).tar.gz -C /data .
 	@echo "Backup completed in backups/ directory"
 
 setup: ## Initial setup - copy example env and start services
@@ -59,6 +53,9 @@ setup: ## Initial setup - copy example env and start services
 	fi
 	@echo "Starting services..."
 	@make up
+
+setup-couchdb: ## Configure CouchDB for Obsidian LiveSync
+	./setup-couchdb.sh
 
 dev: ## Development mode - start with logs following
 	docker-compose up
