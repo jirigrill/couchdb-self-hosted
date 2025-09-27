@@ -40,6 +40,7 @@ Key configuration options:
 - `COUCHDB_PASSWORD`: Admin password for CouchDB
 - `COUCHDB_PORT`: Port for CouchDB (default: 5984)
 - `DATABASE_NAME`: Name for Obsidian database (default: obsidiandb)
+- `COUCHDB_EXTERNAL_DOMAIN`: External domain for reverse proxy access (e.g., `https://couchdb.your-domain.com`)
 
 ## Development Setup
 
@@ -87,9 +88,18 @@ The `make setup-couchdb` command will:
 ### Obsidian LiveSync Configuration
 
 Configure the LiveSync plugin with:
-- **Database URL**: `http://localhost:5984`
+- **Database URL**: `http://localhost:5984` (local) or your `COUCHDB_EXTERNAL_DOMAIN` (remote)
 - **Database name**: `obsidiandb` (or as configured in `.env`)
 - **Username/Password**: As configured in `.env`
+
+### External Access via Reverse Proxy
+
+For external access using reverse proxy setup:
+
+1. Set `COUCHDB_EXTERNAL_DOMAIN` in `.env` to your external domain
+2. Configure reverse proxy following [jirigrill/reverse-proxy-setup](https://github.com/jirigrill/reverse-proxy-setup)
+3. Run `make setup-couchdb` to configure CORS for external access
+4. Use the external domain in Obsidian LiveSync configuration
 
 ## Backup and Recovery
 

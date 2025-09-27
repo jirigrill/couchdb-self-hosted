@@ -38,8 +38,14 @@ echo "=================================================="
 # Wait for CouchDB to be ready
 echo "Waiting for CouchDB to be ready..."
 for i in {1..30}; do
+    # Try without auth first (new installation)
     if curl -s -f "${COUCHDB_URL}/" >/dev/null 2>&1; then
-        echo "CouchDB is ready"
+        echo "CouchDB is ready (no auth required)"
+        break
+    fi
+    # Try with auth (already configured)
+    if curl -s -f -u "${COUCHDB_USER}:${COUCHDB_PASSWORD}" "${COUCHDB_URL}/" >/dev/null 2>&1; then
+        echo "CouchDB is ready (auth required)"
         break
     fi
     echo "Attempt $i/30 - waiting..."
@@ -97,13 +103,13 @@ set_config() {
 # Configuration entries for Obsidian LiveSync
 set_config "chttpd" "require_valid_user" "true"
 set_config "chttpd_auth" "require_valid_user" "true"
-set_config "httpd" "WWW-Authenticate" "Basic realm=\"couchdb\""
+set_config "httpd" "WWW-Authenticate" "Basic realm=\\\"couchdb\\\""
 set_config "httpd" "enable_cors" "true"
 set_config "chttpd" "enable_cors" "true"
 set_config "chttpd" "max_http_request_size" "4294967296"
 set_config "couchdb" "max_document_size" "50000000"
 set_config "cors" "credentials" "true"
-set_config "cors" "origins" "app://obsidian.md,capacitor://localhost,http://localhost"
+set_config "cors" "origins" "app://obsidian.md,capacitor://localhost,http://localhost,${COUCHDB_EXTERNAL_DOMAIN}"
 
 echo "CouchDB configuration completed"
 
